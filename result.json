@@ -1,0 +1,111 @@
+{
+  "summary": {
+    "total": 9,
+    "verbatim": 9,
+    "inferred": 0,
+    "failed_citations": 0,
+    "unlocated": 0
+  },
+  "verbatim_facts": [
+    {
+      "id": 1,
+      "fact": "The speaker heads security for a mid-sized Australian telco.",
+      "type": "entity",
+      "confidence": "high",
+      "verbatim": "I head security for a mid-sized Australian telco",
+      "position": {
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "id": 2,
+      "fact": "The speaker's thesis is that offshoring customer-care access, not the CRM platform itself, drives credential-abuse breaches.",
+      "type": "causal",
+      "confidence": "high",
+      "verbatim": "offshoring customer-care access — not the CRM platform itself — is what drives these credential-abuse breaches",
+      "position": {
+        "line": 1,
+        "column": 73
+      }
+    },
+    {
+      "id": 3,
+      "fact": "Tightening privileged access is asserted to be a better mitigation strategy than swapping vendors or stripping data out of support tools.",
+      "type": "causal",
+      "confidence": "high",
+      "verbatim": "tightening privileged access beats swapping vendors or stripping data out of the support tools",
+      "position": {
+        "line": 1,
+        "column": 188
+      }
+    },
+    {
+      "id": 4,
+      "fact": "The speaker intends to test the thesis against recent surfacing information, including an energy retailer.",
+      "type": "event",
+      "confidence": "medium",
+      "verbatim": "Test that against what's actually surfaced lately, including the energy retailer",
+      "position": {
+        "line": 1,
+        "column": 284
+      }
+    },
+    {
+      "id": 5,
+      "fact": "The energy retailer admitted to unauthorized access to its customer care systems.",
+      "type": "event",
+      "confidence": "high",
+      "verbatim": "the energy retailer that admitted unauthorised access to its customer care systems",
+      "position": {
+        "line": 1,
+        "column": 345
+      }
+    },
+    {
+      "id": 6,
+      "fact": "The attacker of the energy retailer now claims a private settlement.",
+      "type": "event",
+      "confidence": "high",
+      "verbatim": "whose attacker now claims a private settlement",
+      "position": {
+        "line": 1,
+        "column": 432
+      }
+    },
+    {
+      "id": 7,
+      "fact": "The speaker intends to compare main mitigation options based on detection lag, regulator and notification exposure, and cost.",
+      "type": "other",
+      "confidence": "high",
+      "verbatim": "Compare the main mitigation options on detection lag, regulator and notification exposure, and cost",
+      "position": {
+        "line": 1,
+        "column": 480
+      }
+    },
+    {
+      "id": 8,
+      "fact": "The speaker seeks to determine which newest specifics should change their plan.",
+      "type": "other",
+      "confidence": "high",
+      "verbatim": "and tell me which of the newest specifics should change my plan",
+      "position": {
+        "line": 1,
+        "column": 581
+      }
+    },
+    {
+      "id": 9,
+      "fact": "The web search cutoff date is 2026-08-22.",
+      "type": "numeric",
+      "confidence": "high",
+      "verbatim": "Search cutoff: 2026-08-22",
+      "position": {
+        "line": 3,
+        "column": 2
+      }
+    }
+  ],
+  "inferred_facts": []
+}
