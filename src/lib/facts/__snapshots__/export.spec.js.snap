@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`reviewed JSON export > serializes a stable, readable document with every human review 1`] = `
+"{
+  "facts": [
+    {
+      "id": 1,
+      "fact": "A claim",
+      "type": "quote",
+      "confidence": "high",
+      "verbatim": null,
+      "human_review": {
+        "status": "verified",
+        "notes": "Supported.",
+        "corrected_fact": null
+      }
+    },
+    {
+      "id": 2,
+      "fact": "Another claim",
+      "type": "numeric",
+      "confidence": "low",
+      "verbatim": "12",
+      "human_review": {
+        "status": "pending",
+        "notes": "",
+        "corrected_fact": null
+      }
+    }
+  ]
+}
+"
+`;
