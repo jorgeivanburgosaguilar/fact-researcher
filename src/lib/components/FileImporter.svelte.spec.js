@@ -6,10 +6,11 @@ test('expone un selector de archivo etiquetado y anuncia errores de importación
   const onfile = vi.fn();
   const screen = await render(FileImporter, { onfile });
 
-  await expect.element(screen.getByRole('button', { name: 'Seleccionar archivo' })).toBeVisible();
+  const selectButton = screen.getByRole('button', { name: 'Seleccionar archivo', exact: true });
+  await expect.element(selectButton).toBeVisible();
   await expect.element(screen.getByLabelText('Seleccionar archivo JSON')).toBeVisible();
 
-  await screen.getByRole('button', { name: 'Seleccionar archivo' }).press('Enter');
+  await selectButton.click();
   expect(onfile).not.toHaveBeenCalled();
 
   const invalidFile = new File(['sin formato'], 'evidencia.txt', { type: 'text/plain' });
