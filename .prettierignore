@@ -1,0 +1,9 @@
+node_modules/
+.svelte-kit/
+build/
+coverage/
+test-results/
+playwright-report/
+pnpm-lock.yaml
+result.json
+
