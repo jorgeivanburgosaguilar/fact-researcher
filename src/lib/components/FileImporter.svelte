@@ -1,13 +1,11 @@
 <script>
   /** @typedef {{ onfile?: (file: File) => void, error?: string }} Props */
-
   /** @type {Props} */
   let { onfile = () => {}, error = '' } = $props();
-
+  /** @type {HTMLInputElement | undefined} */
   let input;
   let dragActive = $state(false);
   let localError = $state('');
-
   /** @param {File | undefined} file */
   function selectFile(file) {
     localError = '';
@@ -18,7 +16,6 @@
     }
     onfile(file);
   }
-
   /** @param {DragEvent} event */
   function dropFile(event) {
     event.preventDefault();
@@ -42,7 +39,6 @@
       Importa un documento de facts para calibrar cada afirmación con una revisión humana.
     </p>
   </div>
-
   <div
     class:!border-blue-700={dragActive}
     class:bg-blue-50={dragActive}
@@ -79,14 +75,13 @@
       onchange={(event) => selectFile(event.currentTarget.files?.[0])}
     />
   </div>
-
-  {#if error || localError}
-    <p class="mt-4 border-l border-red-700 bg-red-50 px-4 py-3 text-sm text-red-900" role="alert">
+  {#if error || localError}<p
+      class="mt-4 border-l border-red-700 bg-red-50 px-4 py-3 text-sm text-red-900"
+      role="alert"
+    >
       <span class="font-semibold">No se pudo importar.</span>
       {error || localError}
-    </p>
-  {/if}
-
+    </p>{/if}
   <aside class="mt-6 border-t border-slate-300 pt-5" aria-label="Privacidad">
     <h2 class="text-sm font-semibold text-slate-900">Privado por diseño</h2>
     <p class="mt-1 text-sm leading-6 text-slate-600">
