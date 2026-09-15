@@ -1,5 +1,6 @@
 <script>
   import { CONFIDENCE_LEVELS, FACT_TYPES, REVIEW_STATUSES } from '$lib/facts/contracts.js';
+  import ReviewTray from './ReviewTray.svelte';
 
   /** @typedef {import('$lib/facts/contracts.js').ReviewedFact} ReviewedFact */
   /** @typedef {import('$lib/facts/contracts.js').ReviewStatus} ReviewStatus */
@@ -18,6 +19,7 @@
   let typeFilter = $state('all');
   let confidenceFilter = $state('all');
   let filtersOpen = $state(false);
+  /** @type {number | null} */
   let openIndex = $state(null);
 
   const statusLabel = { pending: 'Pendiente', verified: 'Verídico', rejected: 'Falso' };
@@ -26,6 +28,11 @@
     pending: 'border-amber-700 bg-amber-50 text-amber-950',
     verified: 'border-emerald-700 bg-emerald-50 text-emerald-950',
     rejected: 'border-red-700 bg-red-50 text-red-950'
+  };
+  const statusMarker = {
+    pending: 'border-l-amber-700',
+    verified: 'border-l-emerald-700',
+    rejected: 'border-l-red-700'
   };
 
   const reviewedCount = $derived(
@@ -133,7 +140,7 @@
           <select
             bind:value={statusFilter}
             class="mt-1 block w-full rounded-md border-slate-400 text-sm focus:border-blue-700 focus:ring-blue-700"
-            ><option value="all">Todos</option>{#each REVIEW_STATUSES as status}<option
+            ><option value="all">Todos</option>{#each REVIEW_STATUSES as status (status)}<option
                 value={status}>{statusLabel[status]}</option
               >{/each}</select
           >
@@ -143,7 +150,7 @@
           <select
             bind:value={typeFilter}
             class="mt-1 block w-full rounded-md border-slate-400 text-sm focus:border-blue-700 focus:ring-blue-700"
-            ><option value="all">Todos</option>{#each FACT_TYPES as type}<option value={type}
+            ><option value="all">Todos</option>{#each FACT_TYPES as type (type)}<option value={type}
                 >{type}</option
               >{/each}</select
           >
@@ -153,8 +160,9 @@
           <select
             bind:value={confidenceFilter}
             class="mt-1 block w-full rounded-md border-slate-400 text-sm focus:border-blue-700 focus:ring-blue-700"
-            ><option value="all">Todas</option>{#each CONFIDENCE_LEVELS as confidence}<option
-                value={confidence}>{confidence}</option
+            ><option value="all">Todas</option
+            >{#each CONFIDENCE_LEVELS as confidence (confidence)}<option value={confidence}
+                >{confidence}</option
               >{/each}</select
           >
         </label>
@@ -189,11 +197,8 @@
             {#each filteredFacts as { item, index } (index)}
               <tr class="border-b border-slate-200 align-top hover:bg-slate-50"
                 ><td
-                  class="border-l border-l-{item.human_review.status === 'pending'
-                    ? 'amber'
-                    : item.human_review.status === 'verified'
-                      ? 'emerald'
-                      : 'red'}-700 px-3 py-4 font-mono text-sm">{item.id}</td
+                  class={`border-l ${statusMarker[item.human_review.status]} px-3 py-4 font-mono text-sm`}
+                  >{item.id}</td
                 ><td class="max-w-md px-3 py-4 text-sm leading-6 font-medium">{item.fact}</td><td
                   class="max-w-md px-3 py-4 text-sm leading-6 text-slate-600"
                   >{item.verbatim ?? 'Sin evidencia literal'}</td
@@ -229,11 +234,7 @@
       <div class="mt-4 grid gap-3 md:hidden">
         {#each filteredFacts as { item, index } (index)}
           <article
-            class="border border-l border-slate-300 border-l-{item.human_review.status === 'pending'
-              ? 'amber'
-              : item.human_review.status === 'verified'
-                ? 'emerald'
-                : 'red'}-700 bg-white p-4"
+            class={`border border-l border-slate-300 ${statusMarker[item.human_review.status]} bg-white p-4`}
           >
             <div class="flex items-start justify-between gap-3">
               <span class="font-mono text-xs text-slate-600"
@@ -263,35 +264,3 @@
     {/if}
   </section>
 </main>
-
-{#snippet ReviewTray(item, onupdate)}
-  <fieldset class="grid gap-4 lg:grid-cols-[13rem_1fr_1fr]">
-    <legend class="mb-2 text-sm font-semibold">Registrar revisión</legend>
-    <label class="text-sm font-semibold text-slate-800"
-      >Decisión<select
-        class="mt-1 block w-full rounded-md border-slate-400 text-sm focus:border-blue-700 focus:ring-blue-700"
-        value={item.human_review.status}
-        onchange={(event) => onupdate({ ...item.human_review, status: event.currentTarget.value })}
-        >{#each REVIEW_STATUSES as status}<option value={status}>{statusLabel[status]}</option
-          >{/each}</select
-      ></label
-    >
-    <label class="text-sm font-semibold text-slate-800"
-      >Notas<textarea
-        class="mt-1 block min-h-24 w-full rounded-md border-slate-400 text-sm focus:border-blue-700 focus:ring-blue-700"
-        value={item.human_review.notes}
-        oninput={(event) => onupdate({ ...item.human_review, notes: event.currentTarget.value })}
-        placeholder="Razón o fuente de la decisión"
-      ></textarea></label
-    >
-    <label class="text-sm font-semibold text-slate-800"
-      >Corrección propuesta<textarea
-        class="mt-1 block min-h-24 w-full rounded-md border-slate-400 text-sm focus:border-blue-700 focus:ring-blue-700"
-        value={item.human_review.corrected_fact ?? ''}
-        oninput={(event) =>
-          onupdate({ ...item.human_review, corrected_fact: event.currentTarget.value || null })}
-        placeholder="No altera el fact original"
-      ></textarea></label
-    >
-  </fieldset>
-{/snippet}

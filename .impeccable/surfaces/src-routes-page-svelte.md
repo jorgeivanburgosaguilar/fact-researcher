@@ -1,7 +1,7 @@
 ---
 version: 1
-slug: "src-routes-page-svelte"
-primary_target: "src/routes/+page.svelte"
+slug: 'src-routes-page-svelte'
+primary_target: 'src/routes/+page.svelte'
 related_targets: []
 ---
 

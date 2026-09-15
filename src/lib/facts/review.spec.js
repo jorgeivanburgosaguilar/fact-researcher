@@ -7,7 +7,7 @@ import {
   normalizeReviewedDocument,
   updateHumanReviewAtIndex
 } from './review.js';
-
+/** @type {import('./contracts.js').FactsDocument} */
 const source = {
   facts: [
     { id: 7, fact: 'First duplicate', type: 'quote', confidence: 'high', verbatim: null },
@@ -15,13 +15,18 @@ const source = {
     { id: 9, fact: 'Third fact', type: 'event', confidence: 'medium', verbatim: null }
   ]
 };
-
 describe('review state', () => {
   it('normalizes partial reviews without mutating facts', () => {
-    const reviewed = normalizeReviewedDocument({
-      facts: [{ ...source.facts[0], human_review: { status: 'verified', notes: 12 } }]
-    });
-
+    const reviewed = normalizeReviewedDocument(
+      /** @type {{ facts: Array<import('./contracts.js').Fact & { human_review?: unknown }> }} */ ({
+        facts: [
+          {
+            ...source.facts[0],
+            human_review: { status: 'verified', notes: /** @type {unknown} */ (12) }
+          }
+        ]
+      })
+    );
     expect(reviewed.facts[0].human_review).toEqual({
       status: 'verified',
       notes: '',
@@ -29,7 +34,6 @@ describe('review state', () => {
     });
     expect(source.facts[0]).not.toHaveProperty('human_review');
   });
-
   it('updates only the selected array index when IDs repeat', () => {
     const document = normalizeReviewedDocument(source);
     const updated = updateHumanReviewAtIndex(document, 1, {
@@ -37,7 +41,6 @@ describe('review state', () => {
       notes: 'The number has no source.',
       corrected_fact: '41'
     });
-
     expect(updated).not.toBe(document);
     expect(updated.facts[0]).toBe(document.facts[0]);
     expect(updated.facts[1].human_review).toEqual({
@@ -46,18 +49,14 @@ describe('review state', () => {
       corrected_fact: '41'
     });
   });
-
   it('returns the original document for an unavailable index', () => {
     const document = normalizeReviewedDocument(source);
-
     expect(updateHumanReviewAtIndex(document, 5, { status: 'verified' })).toBe(document);
   });
-
   it('calculates completion and filters facts in original order', () => {
     let document = normalizeReviewedDocument(source);
     document = updateHumanReviewAtIndex(document, 0, { status: 'verified' });
     document = updateHumanReviewAtIndex(document, 1, { status: 'rejected' });
-
     expect(getReviewProgress(document)).toEqual({
       total: 3,
       pending: 1,
@@ -73,10 +72,8 @@ describe('review state', () => {
       7, 7
     ]);
   });
-
   it('recognizes only complete, schema-safe reviewed documents', () => {
     const document = normalizeReviewedDocument(source);
-
     expect(isReviewedFactsDocument(document)).toBe(true);
     expect(isReviewedFactsDocument({ facts: [{ ...document.facts[0], unexpected: true }] })).toBe(
       false
