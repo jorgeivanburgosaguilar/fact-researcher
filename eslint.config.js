@@ -19,6 +19,13 @@ export default [
     }
   },
   {
-    ignores: ['build/', '.svelte-kit/', 'coverage/', 'node_modules/', 'test-results/']
+    ignores: [
+      'build/',
+      '.svelte-kit/',
+      'coverage/',
+      'node_modules/',
+      'test-results/',
+      '.worktrees/'
+    ]
   }
 ];
