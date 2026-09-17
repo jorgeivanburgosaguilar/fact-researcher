@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseResultJson } from './import-validation.js';
 import { deleteFactAtIndex, updateFactAtIndex } from './review.js';
 import { serializeReviewedDocument } from './export.js';
+
 const source = {
   summary: { total: 99, verbatim: 99, inferred: 0, failed_citations: 2, unlocated: 3 },
   verbatim_facts: [
@@ -16,6 +17,7 @@ const source = {
   ],
   inferred_facts: []
 };
+
 describe('result.json', () => {
   it('normaliza los campos enriquecidos y conserva posición', () => {
     const result = parseResultJson(JSON.stringify(source));
@@ -32,10 +34,33 @@ describe('result.json', () => {
       unlocated: 3
     });
   });
+
+  it('acepta posiciones nulas y convierte el estado heredado a pendiente', () => {
+    const result = parseResultJson(
+      JSON.stringify({
+        ...source,
+        inferred_facts: [
+          {
+            ...source.verbatim_facts[0],
+            id: 2,
+            position: { line: null, column: null },
+            verification_status: 'not_verified'
+          }
+        ]
+      })
+    );
+
+    expect(result.inferred_facts[0]).toMatchObject({
+      position: { line: null, column: null },
+      verification_status: 'pending'
+    });
+  });
+
   it('rechaza JSON y estructura inválidos', () => {
     expect(() => parseResultJson('{')).toThrow('JSON válido');
     expect(() => parseResultJson(JSON.stringify({ facts: [] }))).toThrow('root.summary');
   });
+
   it('edita, elimina y recalcula los contadores sin perder especiales', () => {
     const result = parseResultJson(JSON.stringify(source));
     const edited = updateFactAtIndex(result, 'verbatim_facts', 0, {

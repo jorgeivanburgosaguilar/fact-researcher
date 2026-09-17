@@ -1,8 +1,8 @@
 // @ts-nocheck
 /** @typedef {'quote' | 'numeric' | 'event' | 'entity' | 'definition' | 'causal' | 'other'} FactType */
 /** @typedef {'high' | 'medium' | 'low'} Confidence */
-/** @typedef {'pending' | 'verified' | 'not_verified'} VerificationStatus */
-/** @typedef {{ line: number, column: number }} FactPosition */
+/** @typedef {'pending' | 'verified'} VerificationStatus */
+/** @typedef {{ line: number | null, column: number | null }} FactPosition */
 /** @typedef {{ id: number, fact: string, type: FactType, confidence: Confidence, verbatim: string | null, position: FactPosition, notes: string, verification_status: VerificationStatus }} Fact */
 /** @typedef {{ total: number, verbatim: number, inferred: number, failed_citations: number, unlocated: number }} ResultSummary */
 /** @typedef {{ summary: ResultSummary, verbatim_facts: Fact[], inferred_facts: Fact[] }} ResultDocument */
@@ -17,7 +17,7 @@ export const FACT_TYPES = /** @type {const} */ ([
   'other'
 ]);
 export const CONFIDENCE_LEVELS = /** @type {const} */ (['high', 'medium', 'low']);
-export const VERIFICATION_STATUSES = /** @type {const} */ (['pending', 'verified', 'not_verified']);
+export const VERIFICATION_STATUSES = /** @type {const} */ (['pending', 'verified']);
 export const DEFAULT_FACT_ENRICHMENT = /** @type {const} */ ({
   notes: '',
   verification_status: 'pending'

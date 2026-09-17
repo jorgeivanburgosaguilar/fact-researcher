@@ -16,6 +16,19 @@ html.dark {
   color: #f1f5f9;
 }
 
+html.dark input,
+html.dark select,
+html.dark textarea {
+  color: #f1f5f9;
+  background-color: #020617;
+  border-color: #475569;
+}
+
+html.dark select option {
+  color: #f1f5f9;
+  background-color: #020617;
+}
+
 body {
   margin: 0;
   min-width: 320px;
