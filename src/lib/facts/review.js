@@ -8,7 +8,7 @@ export function normalizeResultDocument(document) {
     ...fact,
     position: { ...fact.position },
     notes: typeof fact.notes === 'string' ? fact.notes : '',
-    verification_status: ['pending', 'verified', 'not_verified'].includes(fact.verification_status)
+    verification_status: ['pending', 'verified'].includes(fact.verification_status)
       ? fact.verification_status
       : 'pending'
   }));
@@ -16,7 +16,7 @@ export function normalizeResultDocument(document) {
     ...fact,
     position: { ...fact.position },
     notes: typeof fact.notes === 'string' ? fact.notes : '',
-    verification_status: ['pending', 'verified', 'not_verified'].includes(fact.verification_status)
+    verification_status: ['pending', 'verified'].includes(fact.verification_status)
       ? fact.verification_status
       : 'pending'
   }));

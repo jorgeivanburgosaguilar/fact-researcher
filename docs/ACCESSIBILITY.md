@@ -1,23 +1,24 @@
 # Accesibilidad
 
-Fecha: 2026-09-16. Alcance: importación, borrador local, lista de revisión y exportación de Fact Researcher en escritorio.
+Fecha: 2026-09-16. Alcance: importación, borrador local, workbench de revisión y exportación de Fact Researcher en escritorio.
 
 ## Superficie actual
 
-La interfaz es desktop-first y presenta una lista simple de facts. En cada fila, el ID y el texto original permanecen visibles a la izquierda. A la derecha aparecen la categoría (`type`), un campo de notas y el estado de revisión: **Sin verificar**, **Correcto** o **Incorrecto**. No hay filtros, progreso, ReviewTray, paneles expandibles, tabla/tarjetas móviles ni validación específica a 390 px.
+La interfaz es desktop-first y presenta un workbench de dos paneles. La lista única de facts, a la izquierda, muestra ID, origen, tipo, confianza y una vista previa; el panel derecho muestra el detalle editable del fact seleccionado. Los facts textuales aparecen antes que los inferidos, sin perder su etiqueta de origen.
 
 El encabezado ofrece el nombre del archivo, el selector **Sistema/Claro/Oscuro** y la exportación. La aplicación importa y valida JSON localmente, guarda el borrador en `localStorage` y exporta el JSON enriquecido sin solicitudes de red.
 
 ## Controles y estados
 
-- Los campos de estado y notas tienen etiquetas asociadas y son operables con teclado.
-- Los controles muestran foco visible y los estados se expresan con texto; el color solo aporta refuerzo visual.
+- La lista tiene semántica `listbox`/`option`, refleja la selección con `aria-selected` y mantiene visible el fact activo al elegirlo.
+- El ID se expone como salida de solo lectura. Fact, tipo, confianza, verbatim, línea, columna y notas tienen etiquetas asociadas.
+- Línea y columna pueden dejarse vacías para guardar `null`; las notas admiten contenido de investigación extenso.
+- El estado se selecciona con texto explícito: **Pendiente** o **Verificado**. El color solo aporta refuerzo visual.
+- Los controles muestran foco visible y el tema oscuro declara color y fondo para controles nativos.
 - Los errores de importación usan `role="alert"`; los avisos de almacenamiento usan una región de estado anunciable.
-- La preferencia de tema se guarda de forma tolerante a fallos y se aplica mediante `html.dark`, incluyendo la preferencia del sistema.
-- Los facts originales y sus campos de entrada se conservan; notas y estado se agregan en `human_review`.
 
 ## Verificación automatizada
 
-La suite de componentes Vitest cubre nombres accesibles, importación, estados, notas, persistencia, restauración, tema y exportación. El flujo E2E de Playwright ejecuta Chromium headless y cubre carga de JSON en memoria, espera de hidratación, edición de nota, estado Incorrecto, restauración del borrador y descarga tras aceptar la confirmación de facts pendientes.
+La suite cubre la normalización de datos, posiciones nulas, compatibilidad de estados heredados, selección de un fact, actualización de notas, cambio de estado, persistencia, tema y exportación.
 
 La aplicación no usa red, analytics, recursos remotos ni procesamiento de servidor.

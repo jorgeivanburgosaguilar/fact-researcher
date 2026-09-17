@@ -27,6 +27,11 @@ function requireNumber(value, key, path) {
     throw new FactsImportError(`${path}.${key}`, 'debe ser un número finito.');
   return /** @type {number} */ (value[key]);
 }
+/** @param {Record<string, unknown>} value @param {string} key @param {string} path */
+function requireNullableNumber(value, key, path) {
+  if (value[key] === null) return null;
+  return requireNumber(value, key, path);
+}
 /** @param {unknown} value @param {string} path @returns {Fact} */
 function validateFact(value, path) {
   const fact = requireObject(value, path);
@@ -48,7 +53,9 @@ function validateFact(value, path) {
     throw new FactsImportError(`${path}.notes`, 'debe ser texto.');
   if (
     fact.verification_status !== undefined &&
-    !VERIFICATION_STATUSES.includes(/** @type {any} */ (fact.verification_status))
+    ![...VERIFICATION_STATUSES, 'not_verified'].includes(
+      /** @type {any} */ (fact.verification_status)
+    )
   )
     throw new FactsImportError(
       `${path}.verification_status`,
@@ -61,12 +68,12 @@ function validateFact(value, path) {
     confidence: /** @type {any} */ (fact.confidence),
     verbatim: /** @type {string | null} */ (fact.verbatim),
     position: {
-      line: requireNumber(position, 'line', `${path}.position`),
-      column: requireNumber(position, 'column', `${path}.position`)
+      line: requireNullableNumber(position, 'line', `${path}.position`),
+      column: requireNullableNumber(position, 'column', `${path}.position`)
     },
     notes: typeof fact.notes === 'string' ? fact.notes : DEFAULT_FACT_ENRICHMENT.notes,
     verification_status:
-      fact.verification_status === undefined
+      fact.verification_status === undefined || fact.verification_status === 'not_verified'
         ? DEFAULT_FACT_ENRICHMENT.verification_status
         : /** @type {any} */ (fact.verification_status)
   };
