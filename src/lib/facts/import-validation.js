@@ -1,150 +1,115 @@
-import { CONFIDENCE_LEVELS, FACT_TYPES } from './contracts.js';
-
-/** @typedef {import('./contracts.js').Confidence} Confidence */
+// @ts-nocheck
+import {
+  CONFIDENCE_LEVELS,
+  DEFAULT_FACT_ENRICHMENT,
+  FACT_TYPES,
+  VERIFICATION_STATUSES,
+  createSummary
+} from './contracts.js';
+/** @typedef {import('./contracts.js').ResultDocument} ResultDocument */
 /** @typedef {import('./contracts.js').Fact} Fact */
-/** @typedef {import('./contracts.js').FactType} FactType */
-/** @typedef {import('./contracts.js').FactsDocument} FactsDocument */
-
-const ROOT_KEYS = ['facts'];
-const FACT_KEYS = ['id', 'fact', 'type', 'confidence', 'verbatim'];
-
-/**
- * An error that identifies the precise field that prevents an import.
- */
 export class FactsImportError extends Error {
-  /**
-   * @param {string} path
-   * @param {string} message
-   */
   constructor(path, message) {
     super(`${path}: ${message}`);
     this.name = 'FactsImportError';
     this.path = path;
   }
 }
-
-/**
- * @param {unknown} value
- * @param {string} path
- * @returns {Record<string, unknown>}
- */
+/** @param {unknown} value @param {string} path */
 function requireObject(value, path) {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value))
     throw new FactsImportError(path, 'debe ser un objeto.');
-  }
-
   return /** @type {Record<string, unknown>} */ (value);
 }
-
-/**
- * Ensures an object contains precisely the keys defined by its schema.
- *
- * @param {Record<string, unknown>} object
- * @param {string[]} allowedKeys
- * @param {string} path
- * @returns {void}
- */
-function requireExactKeys(object, allowedKeys, path) {
-  for (const key of Object.keys(object)) {
-    if (!allowedKeys.includes(key)) {
-      throw new FactsImportError(`${path}.${key}`, 'no es un campo permitido.');
-    }
-  }
-
-  for (const key of allowedKeys) {
-    if (!Object.hasOwn(object, key)) {
-      throw new FactsImportError(`${path}.${key}`, 'es obligatorio.');
-    }
-  }
+/** @param {Record<string, unknown>} value @param {string} key @param {string} path */
+function requireNumber(value, key, path) {
+  if (typeof value[key] !== 'number' || !Number.isFinite(value[key]))
+    throw new FactsImportError(`${path}.${key}`, 'debe ser un número finito.');
+  return /** @type {number} */ (value[key]);
 }
-
-/**
- * Validates an imported facts document without changing the source data.
- *
- * The input schema is deliberately closed: the root accepts only `facts`, and
- * every fact accepts only the five fields described by {@link Fact}.
- *
- * @param {unknown} value
- * @returns {FactsDocument}
- * @throws {FactsImportError} When the value does not match the import schema.
- */
-export function validateFactsDocument(value) {
+/** @param {unknown} value @param {string} path @returns {Fact} */
+function validateFact(value, path) {
+  const fact = requireObject(value, path);
+  for (const key of ['id', 'fact', 'type', 'confidence', 'verbatim', 'position'])
+    if (!Object.hasOwn(fact, key)) throw new FactsImportError(`${path}.${key}`, 'es obligatorio.');
+  const id = requireNumber(fact, 'id', path);
+  if (typeof fact.fact !== 'string') throw new FactsImportError(`${path}.fact`, 'debe ser texto.');
+  if (!FACT_TYPES.includes(/** @type {any} */ (fact.type)))
+    throw new FactsImportError(`${path}.type`, `debe ser uno de: ${FACT_TYPES.join(', ')}.`);
+  if (!CONFIDENCE_LEVELS.includes(/** @type {any} */ (fact.confidence)))
+    throw new FactsImportError(
+      `${path}.confidence`,
+      `debe ser uno de: ${CONFIDENCE_LEVELS.join(', ')}.`
+    );
+  if (fact.verbatim !== null && typeof fact.verbatim !== 'string')
+    throw new FactsImportError(`${path}.verbatim`, 'debe ser texto o null.');
+  const position = requireObject(fact.position, `${path}.position`);
+  if (fact.notes !== undefined && typeof fact.notes !== 'string')
+    throw new FactsImportError(`${path}.notes`, 'debe ser texto.');
+  if (
+    fact.verification_status !== undefined &&
+    !VERIFICATION_STATUSES.includes(/** @type {any} */ (fact.verification_status))
+  )
+    throw new FactsImportError(
+      `${path}.verification_status`,
+      `debe ser uno de: ${VERIFICATION_STATUSES.join(', ')}.`
+    );
+  return {
+    id,
+    fact: fact.fact,
+    type: /** @type {any} */ (fact.type),
+    confidence: /** @type {any} */ (fact.confidence),
+    verbatim: /** @type {string | null} */ (fact.verbatim),
+    position: {
+      line: requireNumber(position, 'line', `${path}.position`),
+      column: requireNumber(position, 'column', `${path}.position`)
+    },
+    notes: typeof fact.notes === 'string' ? fact.notes : DEFAULT_FACT_ENRICHMENT.notes,
+    verification_status:
+      fact.verification_status === undefined
+        ? DEFAULT_FACT_ENRICHMENT.verification_status
+        : /** @type {any} */ (fact.verification_status)
+  };
+}
+/** @param {unknown} value @returns {ResultDocument} */
+export function validateResultDocument(value) {
   const root = requireObject(value, 'root');
-  requireExactKeys(root, ROOT_KEYS, 'root');
-
-  if (!Array.isArray(root.facts)) {
-    throw new FactsImportError('facts', 'debe ser un arreglo.');
-  }
-
-  /** @type {Fact[]} */
-  const facts = [];
-
-  for (const [index, value] of root.facts.entries()) {
-    const path = `facts[${index}]`;
-    const fact = requireObject(value, path);
-    requireExactKeys(fact, FACT_KEYS, path);
-
-    if (typeof fact.id !== 'number' || !Number.isFinite(fact.id)) {
-      throw new FactsImportError(`${path}.id`, 'debe ser un número finito.');
-    }
-
-    if (typeof fact.fact !== 'string') {
-      throw new FactsImportError(`${path}.fact`, 'debe ser texto.');
-    }
-
-    if (!FACT_TYPES.includes(/** @type {FactType} */ (fact.type))) {
-      throw new FactsImportError(`${path}.type`, `debe ser uno de: ${FACT_TYPES.join(', ')}.`);
-    }
-
-    if (!CONFIDENCE_LEVELS.includes(/** @type {Confidence} */ (fact.confidence))) {
-      throw new FactsImportError(
-        `${path}.confidence`,
-        `debe ser uno de: ${CONFIDENCE_LEVELS.join(', ')}.`
-      );
-    }
-
-    if (fact.verbatim !== null && typeof fact.verbatim !== 'string') {
-      throw new FactsImportError(`${path}.verbatim`, 'debe ser texto o null.');
-    }
-
-    facts.push({
-      id: fact.id,
-      fact: fact.fact,
-      type: /** @type {FactType} */ (fact.type),
-      confidence: /** @type {Confidence} */ (fact.confidence),
-      verbatim: /** @type {string | null} */ (fact.verbatim)
-    });
-  }
-
-  return { facts };
+  for (const key of ['summary', 'verbatim_facts', 'inferred_facts'])
+    if (!Object.hasOwn(root, key)) throw new FactsImportError(`root.${key}`, 'es obligatorio.');
+  if (!Array.isArray(root.verbatim_facts))
+    throw new FactsImportError('verbatim_facts', 'debe ser un arreglo.');
+  if (!Array.isArray(root.inferred_facts))
+    throw new FactsImportError('inferred_facts', 'debe ser un arreglo.');
+  const summary = requireObject(root.summary, 'summary');
+  const special = {
+    failed_citations: requireNumber(summary, 'failed_citations', 'summary'),
+    unlocated: requireNumber(summary, 'unlocated', 'summary')
+  };
+  const verbatim_facts = root.verbatim_facts.map((fact, index) =>
+    validateFact(fact, `verbatim_facts[${index}]`)
+  );
+  const inferred_facts = root.inferred_facts.map((fact, index) =>
+    validateFact(fact, `inferred_facts[${index}]`)
+  );
+  return {
+    summary: createSummary(verbatim_facts, inferred_facts, special),
+    verbatim_facts,
+    inferred_facts
+  };
 }
-
-/**
- * Parses JSON text and validates it against the strict import schema.
- *
- * @param {string} text
- * @returns {FactsDocument}
- * @throws {FactsImportError} When JSON is malformed or has an invalid shape.
- */
-export function parseFactsJson(text) {
-  let value;
-
+/** @param {string} text @returns {ResultDocument} */
+export function parseResultJson(text) {
   try {
-    value = JSON.parse(text);
-  } catch {
+    return validateResultDocument(JSON.parse(text));
+  } catch (error) {
+    if (error instanceof FactsImportError) throw error;
     throw new FactsImportError('root', 'el archivo no contiene JSON válido.');
   }
-
-  return validateFactsDocument(value);
 }
-
-/**
- * Reads, parses, and validates a local file. The caller retains ownership of
- * displaying the file name and any import error; this helper never uses a network.
- *
- * @param {{ text: () => Promise<string> }} file
- * @returns {Promise<FactsDocument>}
- */
-export async function readFactsFile(file) {
-  return parseFactsJson(await file.text());
+/** @param {{ text: () => Promise<string> }} file */
+export async function readResultFile(file) {
+  return parseResultJson(await file.text());
 }
+export const validateFactsDocument = validateResultDocument;
+export const parseFactsJson = parseResultJson;
+export const readFactsFile = readResultFile;

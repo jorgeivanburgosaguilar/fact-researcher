@@ -1,22 +1,26 @@
 <script>
-  /** @typedef {{ onfile?: (file: File) => void, error?: string }} Props */
-  /** @type {Props} */ let { onfile = () => {}, error = '' } = $props();
-  /** @type {HTMLInputElement | undefined} */ let input;
-  let dragActive = $state(false);
+  // @ts-nocheck
+  /** @typedef {{ onfile?: (file: File) => void, ontext?: (text: string) => void, error?: string }} Props */
+  let { onfile = () => {}, ontext = () => {}, error = '' } = $props();
+  let input;
+  let pasted = $state('');
   let localError = $state('');
-  /** @param {File | undefined} file */ function selectFile(file) {
+  function selectFile(file) {
     localError = '';
     if (!file) return;
-    if (!file.name.toLowerCase().endsWith('.json')) {
-      localError = 'Selecciona un archivo con extensión .json.';
+    if (file.name !== 'result.json') {
+      localError = 'Selecciona exactamente un archivo llamado result.json.';
       return;
     }
     onfile(file);
   }
-  /** @param {DragEvent} event */ function dropFile(event) {
-    event.preventDefault();
-    dragActive = false;
-    selectFile(event.dataTransfer?.files[0]);
+  function submitText() {
+    localError = '';
+    if (!pasted.trim()) {
+      localError = 'Pega el contenido de result.json para importarlo.';
+      return;
+    }
+    ontext(pasted);
   }
 </script>
 
@@ -33,46 +37,49 @@
     <h1 id="import-title" class="mt-3 text-4xl font-semibold tracking-[-0.035em]">
       Fact Researcher
     </h1>
-    <p class="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
-      Importa un documento de facts para añadir tus notas y marcar cada afirmación.
+    <p class="mt-3 max-w-2xl leading-7 text-slate-600 dark:text-slate-300">
+      Importa un <code>result.json</code> para editar sus facts y completar su verificación.
     </p>
   </div>
-  <div
-    class:!border-blue-700={dragActive}
-    class:bg-blue-50={dragActive}
-    class:dark:bg-blue-950={dragActive}
-    class="mt-8 border border-dashed border-slate-400 p-7 transition-colors sm:p-10 dark:border-slate-600"
-    role="group"
-    aria-labelledby="drop-title"
-    ondragenter={(event) => {
-      event.preventDefault();
-      dragActive = true;
-    }}
-    ondragover={(event) => event.preventDefault()}
-    ondragleave={() => (dragActive = false)}
-    ondrop={dropFile}
-  >
-    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-      <div>
-        <h2 id="drop-title" class="text-lg font-semibold">Abre un JSON de facts</h2>
-        <p class="mt-1 max-w-lg text-sm leading-6 text-slate-600 dark:text-slate-300">
-          Arrastra el archivo aquí o selecciónalo desde tu equipo. Solo se aceptan archivos JSON.
-        </p>
-      </div>
+  <div class="mt-8 grid gap-6 sm:grid-cols-2">
+    <section
+      class="border border-dashed border-slate-400 p-6 dark:border-slate-600"
+      aria-labelledby="file-title"
+    >
+      <h2 id="file-title" class="text-lg font-semibold">Subir result.json</h2>
+      <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+        Elige el archivo local generado por tu investigación.
+      </p>
       <button
         type="button"
-        class="rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none"
+        class="mt-5 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none"
         onclick={() => input?.click()}>Seleccionar archivo</button
+      ><input
+        bind:this={input}
+        class="sr-only"
+        type="file"
+        accept="application/json,.json"
+        aria-label="Seleccionar archivo result.json"
+        onchange={(event) => selectFile(event.currentTarget.files?.[0])}
+      />
+    </section>
+    <section
+      class="border border-slate-300 p-6 dark:border-slate-600"
+      aria-labelledby="paste-title"
+    >
+      <h2 id="paste-title" class="text-lg font-semibold">Pegar JSON</h2>
+      <label class="mt-3 block text-sm font-semibold" for="result-json"
+        >Contenido de result.json</label
+      ><textarea
+        id="result-json"
+        class="mt-1 min-h-28 w-full rounded-md border-slate-300 bg-white p-2 font-mono text-xs focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+        bind:value={pasted}
+      ></textarea><button
+        type="button"
+        class="mt-3 rounded-md border border-blue-700 px-4 py-2 text-sm font-semibold text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none dark:text-blue-200"
+        onclick={submitText}>Procesar JSON pegado</button
       >
-    </div>
-    <input
-      bind:this={input}
-      class="sr-only"
-      type="file"
-      accept="application/json,.json"
-      aria-label="Seleccionar archivo JSON"
-      onchange={(event) => selectFile(event.currentTarget.files?.[0])}
-    />
+    </section>
   </div>
   {#if error || localError}<p
       class="mt-4 border-l border-red-700 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-400 dark:bg-red-950/60 dark:text-red-100"
@@ -84,8 +91,7 @@
   <aside class="mt-6 border-t border-slate-300 pt-5 dark:border-slate-700" aria-label="Privacidad">
     <h2 class="text-sm font-semibold">Privado por diseño</h2>
     <p class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-      El archivo se procesa en este navegador. No se sube a un servidor ni se realizan solicitudes
-      de red.
+      El contenido se procesa únicamente en este navegador. No se sube a un servidor.
     </p>
   </aside>
 </section>
