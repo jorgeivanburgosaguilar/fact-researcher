@@ -1,48 +1,50 @@
 import { expect, test } from '@playwright/test';
+import { importResultDocument } from './fixtures.js';
 
-test('revisa una nota, restaura el borrador y exporta confirmando pendientes', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('fact-researcher-theme', 'light'));
+const DRAFT_STORAGE_KEY = 'fact-researcher.result-draft.v2';
+
+test('edita un fact, restaura el borrador y descarga el documento enriquecido', async ({
+  page
+}) => {
   await page.goto('/');
-  const theme = page.getByLabel('Tema');
-  await expect(theme).toHaveValue('light');
-  await theme.selectOption('dark');
-  await expect(page.locator('html')).toHaveClass(/dark/);
+  await importResultDocument(page);
 
-  const source = {
-    facts: [
-      {
-        id: 7,
-        fact: 'El archivo contiene una afirmación.',
-        type: 'definition',
-        confidence: 'high',
-        verbatim: null
-      },
-      {
-        id: 8,
-        fact: 'Otro fact aún no revisado.',
-        type: 'other',
-        confidence: 'low',
-        verbatim: null
-      }
-    ]
-  };
-  await page.getByLabel('Seleccionar archivo JSON').setInputFiles({
-    name: 'notas.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(JSON.stringify(source))
-  });
-  await expect(page.getByText('El archivo contiene una afirmación.')).toBeVisible();
-  await page.getByLabel('Estado').first().selectOption('rejected');
-  await page.getByLabel('Notas').first().fill('La fuente contradice esta afirmación.');
+  await expect(page.getByText('Fact textual', { exact: true })).toBeVisible();
+  await page.getByRole('option', { name: /Fact inferido/ }).click();
+  await expect(page.getByLabel('ID')).toHaveText('2');
+
+  await page.getByLabel('Notas de investigación').fill('Fuente: https://example.test');
+  await page.getByLabel('Estado de verificación').selectOption('verified');
+
+  await expect
+    .poll(() =>
+      page.evaluate((key) => {
+        const stored = JSON.parse(localStorage.getItem(key));
+        return {
+          originalFilename: stored.originalFilename,
+          fact: stored.document.inferred_facts[0]
+        };
+      }, DRAFT_STORAGE_KEY)
+    )
+    .toEqual({
+      originalFilename: 'result.json',
+      fact: expect.objectContaining({
+        notes: 'Fuente: https://example.test',
+        verification_status: 'verified'
+      })
+    });
+
   await page.reload();
-  await expect(page.getByText('Hay una revisión guardada')).toBeVisible();
-  await page.getByRole('button', { name: 'Restaurar revisión' }).click();
-  await expect(page.getByLabel('Estado').first()).toHaveValue('rejected');
-  await expect(page.getByLabel('Notas').first()).toHaveValue(
-    'La fuente contradice esta afirmación.'
+  await expect(page.getByText('Hay un borrador guardado')).toBeVisible();
+  await page.getByRole('button', { name: 'Restaurar borrador' }).click();
+  await page.getByRole('option', { name: /Fact inferido/ }).click();
+  await expect(page.getByLabel('Notas de investigación')).toHaveValue(
+    'Fuente: https://example.test'
   );
+  await expect(page.getByLabel('Estado de verificación')).toHaveValue('verified');
+
   const downloadPromise = page.waitForEvent('download');
-  page.once('dialog', (dialog) => dialog.accept());
-  await page.getByRole('button', { name: 'Exportar JSON' }).click();
-  expect((await downloadPromise).suggestedFilename()).toBe('notas-reviewed.json');
+  await page.getByRole('button', { name: 'Descargar JSON enriquecido' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('result-enriched.json');
 });

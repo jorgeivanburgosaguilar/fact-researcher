@@ -52,7 +52,7 @@
       </p>
       <button
         type="button"
-        class="mt-5 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none"
+        class="mt-5 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-blue-600 dark:focus-visible:ring-blue-400 dark:focus-visible:ring-offset-slate-950"
         onclick={() => input?.click()}>Seleccionar archivo</button
       ><input
         bind:this={input}
@@ -76,7 +76,7 @@
         bind:value={pasted}
       ></textarea><button
         type="button"
-        class="mt-3 rounded-md border border-blue-700 px-4 py-2 text-sm font-semibold text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none dark:text-blue-200"
+        class="mt-3 rounded-md border border-blue-700 px-4 py-2 text-sm font-semibold text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none dark:border-blue-400 dark:text-blue-200 dark:focus-visible:ring-blue-400 dark:focus-visible:ring-offset-slate-950"
         onclick={submitText}>Procesar JSON pegado</button
       >
     </section>

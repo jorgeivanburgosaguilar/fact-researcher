@@ -9,11 +9,13 @@
 html {
   background: #f8fafc;
   color: #0f172a;
+  color-scheme: light;
 }
 
 html.dark {
   background: #020617;
   color: #f1f5f9;
+  color-scheme: dark;
 }
 
 html.dark input,

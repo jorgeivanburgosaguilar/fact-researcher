@@ -80,7 +80,7 @@
   {#if !document}<div class="flex justify-end px-6 pt-4">
       <ThemeToggle />
     </div>{/if}{#if savedDraft && !document}<section
-      class="mx-auto mt-5 max-w-3xl border border-blue-700 bg-blue-50 p-5"
+      class="mx-auto mt-5 max-w-3xl border border-blue-700 bg-blue-50 p-5 text-blue-950 dark:border-blue-400 dark:bg-blue-950/60 dark:text-blue-100"
       aria-labelledby="draft-title"
     >
       <h1 id="draft-title" class="text-lg font-semibold">Hay un borrador guardado</h1>
@@ -90,16 +90,16 @@
       <div class="mt-4 flex gap-3">
         <button
           type="button"
-          class="rounded bg-blue-700 px-3 py-2 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none"
+          class="rounded bg-blue-700 px-3 py-2 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-50 focus-visible:outline-none dark:bg-blue-600 dark:focus-visible:ring-blue-400 dark:focus-visible:ring-offset-blue-950"
           onclick={restoreDraft}>Restaurar borrador</button
         ><button
           type="button"
-          class="rounded border px-3 py-2 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none"
+          class="rounded border border-blue-700 px-3 py-2 text-sm font-semibold text-blue-900 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-50 focus-visible:outline-none dark:border-blue-400 dark:text-blue-100 dark:focus-visible:ring-blue-400 dark:focus-visible:ring-offset-blue-950"
           onclick={discardDraft}>Descartar borrador</button
         >
       </div>
     </section>{/if}{#if storageNotice}<p
-      class="mx-auto mt-4 max-w-3xl border-l border-amber-700 bg-amber-50 px-4 py-3 text-sm"
+      class="mx-auto mt-4 max-w-3xl border-l border-amber-700 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-400 dark:bg-amber-950/60 dark:text-amber-100"
       role="status"
     >
       {storageNotice}

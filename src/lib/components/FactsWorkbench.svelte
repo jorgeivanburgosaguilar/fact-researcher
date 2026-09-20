@@ -288,7 +288,7 @@
             <label class="mt-4 block text-sm font-semibold text-slate-700 dark:text-slate-200"
               >Notas de investigación
               <textarea
-                class="mt-1 min-h-64 w-full rounded border border-slate-300 bg-white p-3 leading-6 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                class="mt-1 min-h-64 w-full rounded border border-slate-300 bg-white p-3 leading-6 font-normal placeholder:text-slate-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950 dark:placeholder:text-slate-400"
                 value={selected.fact.notes}
                 placeholder="Añade apuntes, enlaces y contexto de la investigación."
                 oninput={(event) => change({ notes: event.currentTarget.value })}
