@@ -3,9 +3,9 @@
 /** @typedef {'high' | 'medium' | 'low'} Confidence */
 /** @typedef {'pending' | 'verified'} VerificationStatus */
 /** @typedef {{ line: number | null, column: number | null }} FactPosition */
-/** @typedef {{ id: number, fact: string, type: FactType, confidence: Confidence, verbatim: string | null, position: FactPosition, notes: string, verification_status: VerificationStatus }} Fact */
+/** @typedef {{ [key: string]: unknown, id: number, fact: string, type: FactType, confidence: Confidence, verbatim: string | null, position: FactPosition, notes: string, verification_status: VerificationStatus }} Fact */
 /** @typedef {{ total: number, verbatim: number, inferred: number, failed_citations: number, unlocated: number }} ResultSummary */
-/** @typedef {{ summary: ResultSummary, verbatim_facts: Fact[], inferred_facts: Fact[] }} ResultDocument */
+/** @typedef {{ [key: string]: unknown, summary: ResultSummary, verbatim_facts: Fact[], inferred_facts: Fact[] }} ResultDocument */
 
 export const FACT_TYPES = /** @type {const} */ ([
   'quote',

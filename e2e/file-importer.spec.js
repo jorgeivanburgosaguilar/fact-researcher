@@ -7,11 +7,28 @@ test('expone controles accesibles y el aviso de privacidad', async ({ page }) =>
   await expect(
     page.getByRole('button', { name: 'Seleccionar archivo', exact: true })
   ).toBeVisible();
-  await expect(page.getByLabel('Seleccionar archivo result.json')).toBeAttached();
+  await expect(page.getByLabel('Seleccionar archivo JSON')).toBeAttached();
   await expect(page.getByLabel('Privacidad')).toContainText('No se sube a un servidor.');
 });
 
-test('rechaza archivos cuyo nombre no es result.json', async ({ page }) => {
+test('acepta un nombre arbitrario cuando el contenido es válido', async ({ page }) => {
+  await page.goto('/');
+  await selectFile(page, {
+    name: 'notas.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(
+      JSON.stringify({
+        summary: { failed_citations: 0, unlocated: 0 },
+        verbatim_facts: [],
+        inferred_facts: []
+      })
+    )
+  });
+
+  await expect(page.getByRole('heading', { name: 'Editar result.json' })).toBeVisible();
+});
+
+test('rechaza contenido inválido aunque el nombre sea arbitrario', async ({ page }) => {
   await page.goto('/');
   await selectFile(page, {
     name: 'notas.json',
@@ -19,7 +36,6 @@ test('rechaza archivos cuyo nombre no es result.json', async ({ page }) => {
     buffer: Buffer.from('{}')
   });
 
-  await expect(page.getByRole('alert')).toContainText(
-    'No se pudo importar. Selecciona exactamente un archivo llamado result.json.'
-  );
+  await expect(page.getByRole('alert')).toContainText('No se pudo importar.');
+  await expect(page.getByRole('alert')).toContainText('root.summary');
 });

@@ -4,6 +4,7 @@ import { deleteFactAtIndex, updateFactAtIndex } from './review.js';
 import { serializeReviewedDocument } from './export.js';
 
 const source = {
+  source_metadata: { pipeline: 'enriched', revision: 7 },
   summary: { total: 99, verbatim: 99, inferred: 0, failed_citations: 2, unlocated: 3 },
   verbatim_facts: [
     {
@@ -12,7 +13,8 @@ const source = {
       type: 'quote',
       confidence: 'high',
       verbatim: null,
-      position: { line: 4, column: 2 }
+      position: { line: 4, column: 2, span: 12 },
+      source_id: 'fact-1'
     }
   ],
   inferred_facts: []
@@ -21,8 +23,10 @@ const source = {
 describe('result.json', () => {
   it('normaliza los campos enriquecidos y conserva posición', () => {
     const result = parseResultJson(JSON.stringify(source));
+    expect(result.source_metadata).toEqual({ pipeline: 'enriched', revision: 7 });
     expect(result.verbatim_facts[0]).toMatchObject({
-      position: { line: 4, column: 2 },
+      position: { line: 4, column: 2, span: 12 },
+      source_id: 'fact-1',
       notes: '',
       verification_status: 'pending'
     });
@@ -76,8 +80,12 @@ describe('result.json', () => {
       failed_citations: 2,
       unlocated: 3
     });
-    expect(
-      JSON.parse(serializeReviewedDocument(edited)).verbatim_facts[0].verification_status
-    ).toBe('verified');
+    const exported = JSON.parse(serializeReviewedDocument(edited));
+    expect(exported.source_metadata).toEqual({ pipeline: 'enriched', revision: 7 });
+    expect(exported.verbatim_facts[0]).toMatchObject({
+      source_id: 'fact-1',
+      position: { span: 12 },
+      verification_status: 'verified'
+    });
   });
 });

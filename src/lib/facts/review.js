@@ -21,6 +21,7 @@ export function normalizeResultDocument(document) {
       : 'pending'
   }));
   return {
+    ...document,
     summary: createSummary(verbatim_facts, inferred_facts, document.summary),
     verbatim_facts,
     inferred_facts

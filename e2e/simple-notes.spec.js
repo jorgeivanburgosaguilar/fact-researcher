@@ -48,3 +48,24 @@ test('edita un fact, restaura el borrador y descarga el documento enriquecido', 
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe('result-enriched.json');
 });
+
+test('muestra el detalle antes que Facts y las notas antes de la información editable', async ({
+  page
+}) => {
+  await page.goto('/');
+  await importResultDocument(page);
+
+  const detailBox = await page.getByRole('heading', { name: 'Detalle del fact' }).boundingBox();
+  const factsBox = await page.getByRole('heading', { name: 'Facts' }).boundingBox();
+  const notesBox = await page.getByLabel('Notas de investigación').boundingBox();
+  const informationBox = await page
+    .getByRole('heading', { name: 'Información del fact' })
+    .boundingBox();
+
+  expect(detailBox).not.toBeNull();
+  expect(factsBox).not.toBeNull();
+  expect(notesBox).not.toBeNull();
+  expect(informationBox).not.toBeNull();
+  expect(detailBox.x).toBeLessThan(factsBox.x);
+  expect(notesBox.y).toBeLessThan(informationBox.y);
+});

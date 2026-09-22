@@ -119,10 +119,10 @@
     aria-label="Workbench de revisión"
   >
     <div
-      class="grid min-h-[38rem] w-full grid-cols-[minmax(17rem,2fr)_minmax(0,3fr)] overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+      class="grid min-h-[38rem] w-full grid-cols-1 overflow-hidden rounded-lg border border-slate-200 bg-white lg:grid-cols-[minmax(0,3fr)_minmax(17rem,2fr)] dark:border-slate-700 dark:bg-slate-900"
     >
       <section
-        class="flex min-h-0 min-w-0 flex-col border-r border-slate-200 dark:border-slate-700"
+        class="flex min-h-0 min-w-0 flex-col border-b border-slate-200 lg:order-2 lg:border-t-0 lg:border-b-0 lg:border-l dark:border-slate-700"
         aria-labelledby="facts-title"
       >
         <div class="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
@@ -191,102 +191,8 @@
         </div>
         {#if selected}
           <div class="min-h-0 flex-1 overflow-y-auto p-5">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                >ID
-                <output
-                  class="mt-1 block rounded border border-slate-200 bg-slate-100 px-3 py-2 font-mono text-sm font-normal text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                  >{selected.fact.id}</output
-                >
-              </label>
-              <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                >Estado de verificación
-                <select
-                  class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                  value={selected.fact.verification_status}
-                  onchange={(event) => change({ verification_status: event.currentTarget.value })}
-                >
-                  {#each VERIFICATION_STATUSES as status (status)}
-                    <option value={status}>{statusLabel[status]}</option>
-                  {/each}
-                </select>
-              </label>
-              <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                >Tipo
-                <select
-                  class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                  value={selected.fact.type}
-                  onchange={(event) => change({ type: event.currentTarget.value })}
-                >
-                  {#each FACT_TYPES as type (type)}<option value={type}>{type}</option>{/each}
-                </select>
-              </label>
-              <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                >Confianza
-                <select
-                  class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                  value={selected.fact.confidence}
-                  onchange={(event) => change({ confidence: event.currentTarget.value })}
-                >
-                  {#each CONFIDENCE_LEVELS as confidence (confidence)}<option value={confidence}
-                      >{confidence}</option
-                    >{/each}
-                </select>
-              </label>
-            </div>
-
-            <label class="mt-4 block text-sm font-semibold text-slate-700 dark:text-slate-200"
-              >Fact
-              <textarea
-                class="mt-1 min-h-28 w-full rounded border border-slate-300 bg-white p-2 leading-6 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                value={selected.fact.fact}
-                oninput={(event) => change({ fact: event.currentTarget.value })}
-              ></textarea>
-            </label>
-            <label class="mt-4 block text-sm font-semibold text-slate-700 dark:text-slate-200"
-              >Verbatim
-              <textarea
-                class="mt-1 min-h-24 w-full rounded border border-slate-300 bg-white p-2 leading-6 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                value={selected.fact.verbatim ?? ''}
-                oninput={(event) => change({ verbatim: event.currentTarget.value || null })}
-              ></textarea>
-            </label>
-
-            <div class="mt-4 grid gap-4 sm:grid-cols-2">
-              <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                >Línea
-                <input
-                  class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                  type="number"
-                  value={selected.fact.position.line ?? ''}
-                  oninput={(event) =>
-                    change({
-                      position: {
-                        ...selected.fact.position,
-                        line: nullableNumber(event.currentTarget.value)
-                      }
-                    })}
-                />
-              </label>
-              <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                >Columna
-                <input
-                  class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
-                  type="number"
-                  value={selected.fact.position.column ?? ''}
-                  oninput={(event) =>
-                    change({
-                      position: {
-                        ...selected.fact.position,
-                        column: nullableNumber(event.currentTarget.value)
-                      }
-                    })}
-                />
-              </label>
-            </div>
-
-            <label class="mt-4 block text-sm font-semibold text-slate-700 dark:text-slate-200"
-              >Notas de investigación
+            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200">
+              Notas de investigación
               <textarea
                 class="mt-1 min-h-64 w-full rounded border border-slate-300 bg-white p-3 leading-6 font-normal placeholder:text-slate-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950 dark:placeholder:text-slate-400"
                 value={selected.fact.notes}
@@ -294,6 +200,111 @@
                 oninput={(event) => change({ notes: event.currentTarget.value })}
               ></textarea>
             </label>
+
+            <section
+              class="mt-6 border-t border-slate-200 pt-5 dark:border-slate-700"
+              aria-labelledby="fact-information-title"
+            >
+              <h3
+                id="fact-information-title"
+                class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+              >
+                Información del fact
+              </h3>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >ID
+                  <output
+                    class="mt-1 block rounded border border-slate-200 bg-slate-100 px-3 py-2 font-mono text-sm font-normal text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                    >{selected.fact.id}</output
+                  >
+                </label>
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >Estado de verificación
+                  <select
+                    class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                    value={selected.fact.verification_status}
+                    onchange={(event) => change({ verification_status: event.currentTarget.value })}
+                  >
+                    {#each VERIFICATION_STATUSES as status (status)}
+                      <option value={status}>{statusLabel[status]}</option>
+                    {/each}
+                  </select>
+                </label>
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >Tipo
+                  <select
+                    class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                    value={selected.fact.type}
+                    onchange={(event) => change({ type: event.currentTarget.value })}
+                  >
+                    {#each FACT_TYPES as type (type)}<option value={type}>{type}</option>{/each}
+                  </select>
+                </label>
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >Confianza
+                  <select
+                    class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                    value={selected.fact.confidence}
+                    onchange={(event) => change({ confidence: event.currentTarget.value })}
+                  >
+                    {#each CONFIDENCE_LEVELS as confidence (confidence)}<option value={confidence}
+                        >{confidence}</option
+                      >{/each}
+                  </select>
+                </label>
+              </div>
+
+              <label class="mt-4 block text-sm font-semibold text-slate-700 dark:text-slate-200"
+                >Fact
+                <textarea
+                  class="mt-1 min-h-28 w-full rounded border border-slate-300 bg-white p-2 leading-6 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                  value={selected.fact.fact}
+                  oninput={(event) => change({ fact: event.currentTarget.value })}
+                ></textarea>
+              </label>
+              <label class="mt-4 block text-sm font-semibold text-slate-700 dark:text-slate-200"
+                >Verbatim
+                <textarea
+                  class="mt-1 min-h-24 w-full rounded border border-slate-300 bg-white p-2 leading-6 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                  value={selected.fact.verbatim ?? ''}
+                  oninput={(event) => change({ verbatim: event.currentTarget.value || null })}
+                ></textarea>
+              </label>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >Línea
+                  <input
+                    class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                    type="number"
+                    value={selected.fact.position.line ?? ''}
+                    oninput={(event) =>
+                      change({
+                        position: {
+                          ...selected.fact.position,
+                          line: nullableNumber(event.currentTarget.value)
+                        }
+                      })}
+                  />
+                </label>
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >Columna
+                  <input
+                    class="mt-1 w-full rounded border border-slate-300 bg-white p-2 font-normal focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-slate-600 dark:bg-slate-950"
+                    type="number"
+                    value={selected.fact.position.column ?? ''}
+                    oninput={(event) =>
+                      change({
+                        position: {
+                          ...selected.fact.position,
+                          column: nullableNumber(event.currentTarget.value)
+                        }
+                      })}
+                  />
+                </label>
+              </div>
+            </section>
 
             <button
               type="button"

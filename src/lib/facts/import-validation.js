@@ -62,12 +62,14 @@ function validateFact(value, path) {
       `debe ser uno de: ${VERIFICATION_STATUSES.join(', ')}.`
     );
   return {
+    ...fact,
     id,
     fact: fact.fact,
     type: /** @type {any} */ (fact.type),
     confidence: /** @type {any} */ (fact.confidence),
     verbatim: /** @type {string | null} */ (fact.verbatim),
     position: {
+      ...position,
       line: requireNullableNumber(position, 'line', `${path}.position`),
       column: requireNullableNumber(position, 'column', `${path}.position`)
     },
@@ -99,6 +101,7 @@ export function validateResultDocument(value) {
     validateFact(fact, `inferred_facts[${index}]`)
   );
   return {
+    ...root,
     summary: createSummary(verbatim_facts, inferred_facts, special),
     verbatim_facts,
     inferred_facts
